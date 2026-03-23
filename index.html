@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIBRARY — Библиотечная система</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f3ee;
+    --bg2: #eae9e3;
+    --surface: #ffffff;
+    --surface2: #f9f8f5;
+    --border: #ddd9d0;
+    --text: #1a1a18;
+    --text2: #5a5951;
+    --text3: #8a887e;
+    --accent: #2d6a4f;
+    --accent2: #40916c;
+    --accent-light: #d8f3dc;
+    --red: #c1121f;
+    --red-light: #fde8e8;
+    --amber: #b5500a;
+    --amber-light: #fef3e2;
+    --blue: #1e4d8c;
+    --blue-light: #dbeafe;
+    --violet: #5b2d8e;
+    --violet-light: #ede9fe;
+    --slate: #475569;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.1), 0 8px 24px rgba(0,0,0,.07);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --bg2: #161b22;
+    --surface: #1c2130;
+    --surface2: #242938;
+    --border: #2d3448;
+    --text: #e8e6e0;
+    --text2: #9a98a0;
+    --text3: #5a5870;
+    --accent: #52b788;
+    --accent2: #74c69d;
+    --accent-light: #1a3d2e;
+    --red: #ff6b6b;
+    --red-light: #3d1a1a;
+    --amber: #ffd166;
+    --amber-light: #3d2e0a;
+    --blue: #74b3fe;
+    --blue-light: #1a2a3d;
+    --violet: #c084fc;
+    --violet-light: #2e1a3d;
+    --slate: #94a3b8;
+    --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    transition: background .3s, color .3s;
+  }
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .header-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 2px 8px rgba(45,106,79,.3);
+  }
+  .logo-text h1 { font-family: 'Spectral', serif; font-size: 20px; font-weight: 700; letter-spacing: .02em; }
+  .logo-text p { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+  .header-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: var(--radius-sm);
+    font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+    transition: all .2s; white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--bg2); box-shadow: var(--shadow); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-violet { background: linear-gradient(135deg, #7c3aed, #9333ea); color: #fff; border-color: transparent; }
+  .btn-violet:hover { opacity: .9; }
+  .btn-danger { background: linear-gradient(135deg, var(--red), #e63946); color: #fff; border-color: transparent; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 7px; }
+  /* TABS */
+  .tabs-bar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; gap: 4px;
+    max-width: 1280px; margin: 0 auto;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; background: none; color: var(--text2);
+    border-bottom: 2px solid transparent;
+    display: flex; align-items: center; gap: 6px;
+    transition: all .2s; white-space: nowrap; font-family: 'Manrope', sans-serif;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  /* MAIN */
+  .main { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  /* CARDS */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-body { padding: 20px; }
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card {
+    padding: 16px; border-radius: var(--radius); color: #fff;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+  }
+  .stat-card::after {
+    content: ''; position: absolute; right: -10px; top: -10px;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .stat-icon { font-size: 28px; opacity: .9; flex-shrink: 0; }
+  .stat-num { font-size: 26px; font-weight: 800; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+  .stat-label { font-size: 11px; opacity: .85; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .bg-blue { background: linear-gradient(135deg, #1e4d8c, #2563eb); box-shadow: 0 4px 14px rgba(37,99,235,.3); }
+  .bg-amber { background: linear-gradient(135deg, #b5500a, #d97706); box-shadow: 0 4px 14px rgba(217,119,6,.3); }
+  .bg-pink { background: linear-gradient(135deg, #be185d, #ec4899); box-shadow: 0 4px 14px rgba(236,72,153,.3); }
+  .bg-violet { background: linear-gradient(135deg, #5b21b6, #7c3aed); box-shadow: 0 4px 14px rgba(124,58,237,.3); }
+  .bg-green { background: linear-gradient(135deg, #065f46, #059669); box-shadow: 0 4px 14px rgba(5,150,105,.3); }
+  .bg-red { background: linear-gradient(135deg, #9b1c1c, #dc2626); box-shadow: 0 4px 14px rgba(220,38,38,.3); }
+  .bg-slate { background: linear-gradient(135deg, #334155, #475569); box-shadow: 0 4px 14px rgba(71,85,105,.3); }
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--bg2); }
+  th { padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 13px; }
+  tr:hover td { background: var(--surface2); }
+  tr:last-child td { border-bottom: none; }
+  .td-title { font-weight: 600; color: var(--text); }
+  .td-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    letter-spacing: .02em; white-space: nowrap;
+  }
+  .badge-green { background: var(--accent-light); color: var(--accent); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-violet { background: var(--violet-light); color: var(--violet); }
+  .badge-gray { background: var(--bg2); color: var(--text2); }
+  .badges { display: flex; flex-wrap: wrap; gap: 4px; }
+  /* SEARCH BAR */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 380px; }
+  .search-wrap input {
+    width: 100%; padding: 8px 12px 8px 36px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 13px;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+  /* AUTHOR CARDS */
+  .authors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .author-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; transition: box-shadow .2s; box-shadow: var(--shadow);
+  }
+  .author-card:hover { box-shadow: var(--shadow-md); }
+  .author-name { font-weight: 700; font-size: 15px; }
+  .author-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .author-books { margin-top: 12px; }
+  .author-book-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); }
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); backdrop-filter: blur(3px);
+    z-index: 1000; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    max-width: 640px; width: 100%; max-height: 90vh;
+    overflow-y: auto; animation: modalIn .2s ease;
+  }
+  .modal-wide { max-width: 900px; }
+  @keyframes modalIn { from { opacity:0; transform: scale(.95) translateY(-10px); } }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .modal-title { font-size: 17px; font-weight: 700; }
+  .modal-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 20px; padding: 2px; line-height: 1; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 20px 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+  /* FORMS */
+  .form-row { display: grid; gap: 14px; margin-bottom: 14px; }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  label { display: block; font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+  input, select {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface2); color: var(--text);
+    font-family: 'Manrope', sans-serif; font-size: 13px; outline: none;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); background: var(--surface); }
+  /* ALERT */
+  .alert {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 8px; font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .alert-warning { background: var(--amber-light); color: var(--amber); border: 1px solid rgba(181,80,10,.2); }
+  /* POPULAR BOOKS */
+  .popular-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    border-radius: var(--radius-sm); background: var(--bg2); margin-bottom: 8px;
+  }
+  .rank {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: #fff; flex-shrink: 0;
+  }
+  .rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+  .rank-3 { background: linear-gradient(135deg, #92400e, #78350f); }
+  /* PROGRESS BAR */
+  .progress-item { margin-bottom: 12px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .progress-bar { height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width .6s ease; }
+  /* SCROLL AREA */
+  .scroll-area { max-height: 220px; overflow-y: auto; }
+  .scroll-area::-webkit-scrollbar { width: 4px; }
+  .scroll-area::-webkit-scrollbar-track { background: transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .recent-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .recent-item:last-child { border-bottom: none; }
+  /* OVERDUE */
+  .overdue-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--red-light); border: 1px solid rgba(193,18,31,.15); border-radius: var(--radius-sm); margin-bottom: 6px; }
+  /* PROFILE */
+  .profile-header { display: flex; align-items: center; gap: 16px; background: var(--bg2); padding: 16px; border-radius: var(--radius); margin-bottom: 16px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #fff; flex-shrink: 0; }
+  .profile-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .profile-stat { text-align: center; background: var(--bg2); padding: 12px; border-radius: var(--radius-sm); }
+  .profile-stat-num { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  /* ER DIAGRAM */
+  .er-container { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .er-tables { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 700px) { .er-tables { grid-template-columns: 1fr 1fr; } }
+  .er-table { border: 2px solid var(--accent); border-radius: 8px; overflow: hidden; }
+  .er-table-header { background: var(--accent); color: #fff; padding: 8px 12px; font-weight: 700; font-size: 13px; text-align: center; }
+  .er-table-body { background: var(--surface); }
+  .er-field { padding: 5px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  .er-field:last-child { border-bottom: none; }
+  .er-pk { color: var(--amber); font-weight: 700; }
+  .er-fk { color: var(--blue); font-weight: 700; }
+  .er-relations { margin-top: 20px; }
+  .er-rel { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg2); border-radius: 6px; margin-bottom: 6px; font-size: 12px; }
+  /* NF */
+  .nf-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .nf-title { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .nf-list { list-style: none; }
+  .nf-list li { padding: 4px 0; font-size: 13px; color: var(--text2); padding-left: 16px; position: relative; }
+  .nf-list li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 40px; color: var(--text3); font-size: 14px; }
+  /* FOOTER */
+  footer { background: var(--surface); border-top: 1px solid var(--border); padding: 14px 24px; text-align: center; font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+  /* ACTION BTNS in table */
+  .action-btns { display: flex; gap: 6px; }
+  @media (max-width: 640px) {
+    .header-btns .btn span { display: none; }
+    .tabs-bar { padding: 0 12px; }
+    .main { padding: 16px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
+    .profile-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📚</div>
+      <div class="logo-text">
+        <h1>LIBRARY</h1>
+        <p>Библиотечная система • 1НФ/2НФ/3НФ</p>
+      </div>
+    </div>
+    <div class="header-btns">
+      <button class="btn btn-sm" onclick="openModal('modal-nf')">🛡 <span>Нормальные формы</span></button>
+      <button class="btn btn-sm" onclick="openModal('modal-er')">📊 <span>ER-диаграмма</span></button>
+      <button class="btn btn-icon btn-sm" onclick="toggleTheme()" id="theme-btn" title="Переключить тему">🌙</button>
+      <button class="btn btn-violet btn-sm" id="auth-btn" onclick="handleAuth()">👤 <span>Демо-вход</span></button>
+    </div>
+  </div>
+</header>
+
+<div style="background:var(--surface); border-bottom:1px solid var(--border);">
+  <div class="tabs-bar" style="max-width:1280px;">
+    <button class="tab active" onclick="switchTab('dashboard')">📈 Дашборд</button>
+    <button class="tab" onclick="switchTab('books')">📖 Книги</button>
+    <button class="tab" onclick="switchTab('authors')">✍️ Авторы</button>
+    <button class="tab" onclick="switchTab('readers')">👥 Читатели</button>
+    <button class="tab" onclick="switchTab('borrowings')">🔄 Выдачи</button>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📈 Топ-3 популярных книги</div></div>
+        <div class="card-body" id="popular-books"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📚 Статистика по жанрам</div></div>
+        <div class="card-body" id="genre-stats"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🕐 Последние выдачи</div></div>
+        <div class="card-body"><div class="scroll-area" id="recent-borrowings"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="color:var(--red)">⚠️ Просроченные выдачи</div></div>
+        <div class="card-body" id="overdue-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="tab-content" id="tab-books">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Поиск по названию или ISBN..." id="book-search" oninput="renderBooks()">
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-book')">➕ Добавить книгу</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Книга</th><th>Авторы</th><th>Жанр</th><th>Год</th><th>ISBN</th><th>Статус</th></tr></thead>
+          <tbody id="books-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHORS -->
+  <div class="tab-content" id="tab-authors">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Поиск по фамилии или имени..." id="author-search" oninput="renderAuthors()">
+      </div>
+    </div>
+    <div class="authors-grid" id="authors-grid"></div>
+  </div>
+
+  <!-- READERS -->
+  <div class="tab-content" id="tab-readers">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Поиск по ФИО, email или телефону..." id="reader-search" oninput="renderReaders()">
+      </div>
+      <button class="btn" style="background:linear-gradient(135deg,#be185d,#ec4899);color:#fff;border-color:transparent;" onclick="openModal('modal-add-reader')">➕ Добавить читателя</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Читатель</th><th>Контакты</th><th>Всего выдач</th><th>На руках</th><th>Просрочено</th><th>Книги</th></tr></thead>
+          <tbody id="readers-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BORROWINGS -->
+  <div class="tab-content" id="tab-borrowings">
+    <div class="toolbar">
+      <button class="btn btn-violet" onclick="openModal('modal-borrow')">➕ Выдать книгу</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Книга</th><th>Читатель</th><th>Дата выдачи</th><th>Дней</th><th>Статус</th><th>Действия</th></tr></thead>
+          <tbody id="borrowings-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>База данных LIBRARY • 6 таблиц • M:N связь • 1НФ / 2НФ / 3НФ нормализация</footer>
+
+<!-- MODAL: ER DIAGRAM -->
+<div class="modal-overlay" id="modal-er">
+  <div class="modal modal-wide" style="max-width:960px;">
+    <div class="modal-header">
+      <div><div class="modal-title">📊 ER-диаграмма базы данных LIBRARY</div><div class="modal-sub">6 таблиц • Связь M:N • Crow's Foot нотация • 1НФ/2НФ/3НФ</div></div>
+      <button class="modal-close" onclick="closeModal('modal-er')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:12px;overflow-x:auto;">
+      <svg id="er-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 560" style="width:100%;min-width:640px;font-family:'JetBrains Mono',monospace;display:block;">
+        <defs>
+          <!-- Crow foot (many) — points LEFT, attaches to right end of line going right into table -->
+          <marker id="er-crow" markerWidth="12" markerHeight="12" refX="0" refY="6" orient="auto">
+            <line x1="0" y1="6" x2="8" y2="1" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="0" y1="6" x2="8" y2="6" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="0" y1="6" x2="8" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+          </marker>
+          <!-- One bar — attaches to left end of line (PK side) -->
+          <marker id="er-one" markerWidth="8" markerHeight="12" refX="8" refY="6" orient="auto">
+            <line x1="6" y1="1" x2="6" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="4" y1="1" x2="4" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+          </marker>
+          <!-- One bar reversed — for end of line arriving at PK side -->
+          <marker id="er-one-r" markerWidth="8" markerHeight="12" refX="0" refY="6" orient="auto">
+            <line x1="2" y1="1" x2="2" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="4" y1="1" x2="4" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+          </marker>
+          <!-- Zero-or-one (circle + bar) for optional FK side -->
+          <marker id="er-zero-one" markerWidth="14" markerHeight="12" refX="14" refY="6" orient="auto">
+            <circle cx="4" cy="6" r="3" fill="none" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="10" y1="1" x2="10" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+          </marker>
+          <!-- Crow foot reversed (many, coming from right) -->
+          <marker id="er-crow-r" markerWidth="12" markerHeight="12" refX="12" refY="6" orient="auto">
+            <line x1="12" y1="6" x2="4" y2="1" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="12" y1="6" x2="4" y2="6" stroke="context-stroke" stroke-width="1.5"/>
+            <line x1="12" y1="6" x2="4" y2="11" stroke="context-stroke" stroke-width="1.5"/>
+          </marker>
+        </defs>
+
+        <!-- ===================== TABLES ===================== -->
+        <!-- Row height = 18px, header = 22px, padding top/bottom = 2px each row -->
+        <!-- Each row: y_top + 2 padding, text at y_top + 13 -->
+
+        <!-- ── GENRES  x=20 y=20  w=160 ── -->
+        <!-- Header y=20..42, rows: id(42..60), name(60..78), desc(78..96) -->
+        <g id="er-t-genres">
+          <rect x="20" y="20" width="160" height="22" fill="#4a7c59" rx="2"/>
+          <text x="100" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="white">GENRES</text>
+          <rect x="20" y="42" width="160" height="18" fill="#f0f4f0" stroke="#999" stroke-width="0.5"/>
+          <text x="26" y="54" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="44" y="54" font-size="10" fill="#222" text-decoration="underline" font-weight="bold">id</text>
+          <text x="175" y="54" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="20" y="60" width="160" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="72" font-size="10" fill="#222">name</text>
+          <text x="175" y="72" font-size="10" fill="#555" text-anchor="end">VARCHAR(50)</text>
+          <rect x="20" y="78" width="160" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="90" font-size="10" fill="#222">description</text>
+          <text x="175" y="90" font-size="10" fill="#555" text-anchor="end">TEXT</text>
+          <rect x="20" y="20" width="160" height="76" fill="none" stroke="#4a7c59" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ── AUTHORS  x=20 y=160  w=180 ── -->
+        <!-- Header y=160..182, rows: id,last,first,middle,birth,country -->
+        <g id="er-t-authors">
+          <rect x="20" y="160" width="180" height="22" fill="#4a5a8c" rx="2"/>
+          <text x="110" y="175" text-anchor="middle" font-size="12" font-weight="bold" fill="white">AUTHORS</text>
+          <rect x="20" y="182" width="180" height="18" fill="#f0f2f8" stroke="#999" stroke-width="0.5"/>
+          <text x="26" y="194" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="44" y="194" font-size="10" fill="#222" text-decoration="underline" font-weight="bold">id</text>
+          <text x="195" y="194" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="20" y="200" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="212" font-size="10" fill="#222">last_name</text>
+          <text x="195" y="212" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="218" width="180" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="230" font-size="10" fill="#222">first_name</text>
+          <text x="195" y="230" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="236" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="248" font-size="10" fill="#222">middle_name</text>
+          <text x="195" y="248" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="254" width="180" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="266" font-size="10" fill="#222">birth_year</text>
+          <text x="195" y="266" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="20" y="272" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="284" font-size="10" fill="#222">country</text>
+          <text x="195" y="284" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="160" width="180" height="130" fill="none" stroke="#4a5a8c" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ── READERS  x=20 y=370  w=180 ── -->
+        <g id="er-t-readers">
+          <rect x="20" y="370" width="180" height="22" fill="#8c4a2e" rx="2"/>
+          <text x="110" y="385" text-anchor="middle" font-size="12" font-weight="bold" fill="white">READERS</text>
+          <rect x="20" y="392" width="180" height="18" fill="#f8f2f0" stroke="#999" stroke-width="0.5"/>
+          <text x="26" y="404" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="44" y="404" font-size="10" fill="#222" text-decoration="underline" font-weight="bold">id</text>
+          <text x="195" y="404" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="20" y="410" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="422" font-size="10" fill="#222">last_name</text>
+          <text x="195" y="422" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="428" width="180" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="440" font-size="10" fill="#222">first_name</text>
+          <text x="195" y="440" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="446" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="458" font-size="10" fill="#222">middle_name</text>
+          <text x="195" y="458" font-size="10" fill="#555" text-anchor="end">VARCHAR</text>
+          <rect x="20" y="464" width="180" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="476" font-size="10" fill="#222">email</text>
+          <text x="195" y="476" font-size="10" fill="#555" text-anchor="end">VARCHAR(255)</text>
+          <rect x="20" y="482" width="180" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="44" y="494" font-size="10" fill="#222">phone</text>
+          <text x="195" y="494" font-size="10" fill="#555" text-anchor="end">VARCHAR(20)</text>
+          <rect x="20" y="370" width="180" height="130" fill="none" stroke="#8c4a2e" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ── BOOKS  x=310 y=20  w=185 ── -->
+        <!-- Rows: id,title,isbn,publish_year,genre_id(FK),is_available -->
+        <!-- genre_id row y = 20+22+18*4=114..132, centre=123 -->
+        <g id="er-t-books">
+          <rect x="310" y="20" width="185" height="22" fill="#4a7c59" rx="2"/>
+          <text x="402" y="35" text-anchor="middle" font-size="12" font-weight="bold" fill="white">BOOKS</text>
+          <rect x="310" y="42" width="185" height="18" fill="#f0f4f0" stroke="#999" stroke-width="0.5"/>
+          <text x="316" y="54" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="334" y="54" font-size="10" fill="#222" text-decoration="underline" font-weight="bold">id</text>
+          <text x="490" y="54" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="310" y="60" width="185" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="334" y="72" font-size="10" fill="#222">title</text>
+          <text x="490" y="72" font-size="10" fill="#555" text-anchor="end">VARCHAR(255)</text>
+          <rect x="310" y="78" width="185" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="334" y="90" font-size="10" fill="#222">isbn</text>
+          <text x="490" y="90" font-size="10" fill="#555" text-anchor="end">VARCHAR(20)</text>
+          <rect x="310" y="96" width="185" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="334" y="108" font-size="10" fill="#222">publish_year</text>
+          <text x="490" y="108" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <!-- genre_id FK row y=114 -->
+          <rect x="310" y="114" width="185" height="18" fill="#fffbe6" stroke="#999" stroke-width="0.5"/>
+          <text x="316" y="126" font-size="10" fill="#1a6aa0" font-weight="bold">FK</text>
+          <text x="334" y="126" font-size="10" fill="#1a6aa0" font-weight="bold">genre_id</text>
+          <text x="490" y="126" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <!-- is_available row y=132 -->
+          <rect x="310" y="132" width="185" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="334" y="144" font-size="10" fill="#222">is_available</text>
+          <text x="490" y="144" font-size="10" fill="#555" text-anchor="end">BOOL</text>
+          <rect x="310" y="20" width="185" height="130" fill="none" stroke="#4a7c59" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ── BOOK_AUTHORS  x=310 y=230  w=185 ── -->
+        <!-- Rows: book_id(FK+PK), author_id(FK+PK) -->
+        <!-- book_id row y=252..270 centre=261, author_id y=270..288 centre=279 -->
+        <g id="er-t-ba">
+          <rect x="310" y="230" width="185" height="22" fill="#2e7c6e" rx="2"/>
+          <text x="402" y="245" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BOOK_AUTHORS</text>
+          <rect x="310" y="252" width="185" height="18" fill="#fffbe6" stroke="#999" stroke-width="0.5"/>
+          <text x="316" y="264" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="332" y="264" font-size="10" fill="#1a6aa0" font-weight="bold">FK</text>
+          <text x="350" y="264" font-size="10" fill="#1a6aa0" font-weight="bold">book_id</text>
+          <text x="490" y="264" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="310" y="270" width="185" height="18" fill="#fff8e6" stroke="#999" stroke-width="0.5"/>
+          <text x="316" y="282" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="332" y="282" font-size="10" fill="#1a6aa0" font-weight="bold">FK</text>
+          <text x="350" y="282" font-size="10" fill="#1a6aa0" font-weight="bold">author_id</text>
+          <text x="490" y="282" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="310" y="230" width="185" height="58" fill="none" stroke="#2e7c6e" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ── BORROWINGS  x=590 y=240  w=200 ── -->
+        <!-- Rows: id, book_id(FK), reader_id(FK), borrow_date, return_date, status -->
+        <!-- book_id row y=284..302 centre=293; reader_id y=302..320 centre=311 -->
+        <g id="er-t-borr">
+          <rect x="590" y="240" width="200" height="22" fill="#8c4a2e" rx="2"/>
+          <text x="690" y="255" text-anchor="middle" font-size="12" font-weight="bold" fill="white">BORROWINGS</text>
+          <rect x="590" y="262" width="200" height="18" fill="#f8f2f0" stroke="#999" stroke-width="0.5"/>
+          <text x="596" y="274" font-size="10" fill="#c07000" font-weight="bold">PK</text>
+          <text x="614" y="274" font-size="10" fill="#222" text-decoration="underline" font-weight="bold">id</text>
+          <text x="785" y="274" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <!-- book_id FK y=280 -->
+          <rect x="590" y="280" width="200" height="18" fill="#fffbe6" stroke="#999" stroke-width="0.5"/>
+          <text x="596" y="292" font-size="10" fill="#1a6aa0" font-weight="bold">FK</text>
+          <text x="614" y="292" font-size="10" fill="#1a6aa0" font-weight="bold">book_id</text>
+          <text x="785" y="292" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <!-- reader_id FK y=298 -->
+          <rect x="590" y="298" width="200" height="18" fill="#fff8e6" stroke="#999" stroke-width="0.5"/>
+          <text x="596" y="310" font-size="10" fill="#1a6aa0" font-weight="bold">FK</text>
+          <text x="614" y="310" font-size="10" fill="#1a6aa0" font-weight="bold">reader_id</text>
+          <text x="785" y="310" font-size="10" fill="#555" text-anchor="end">INT</text>
+          <rect x="590" y="316" width="200" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="614" y="328" font-size="10" fill="#222">borrow_date</text>
+          <text x="785" y="328" font-size="10" fill="#555" text-anchor="end">DATE</text>
+          <rect x="590" y="334" width="200" height="18" fill="white" stroke="#999" stroke-width="0.5"/>
+          <text x="614" y="346" font-size="10" fill="#222">return_date</text>
+          <text x="785" y="346" font-size="10" fill="#555" text-anchor="end">DATE NULL</text>
+          <rect x="590" y="352" width="200" height="18" fill="#f9f9f9" stroke="#999" stroke-width="0.5"/>
+          <text x="614" y="364" font-size="10" fill="#222">status</text>
+          <text x="785" y="364" font-size="10" fill="#555" text-anchor="end">ENUM</text>
+          <rect x="590" y="240" width="200" height="130" fill="none" stroke="#8c4a2e" stroke-width="1.5" rx="2"/>
+        </g>
+
+        <!-- ===================== CONNECTIONS ===================== -->
+        <!--
+          1) GENRES.id → BOOKS.genre_id
+             GENRES right edge x=180, id row centre-y = 42+9 = 51
+             BOOKS left edge x=310, genre_id row centre-y = 114+9 = 123
+             Path: (180,51) → (245,51) → (245,123) → (310,123)
+             PK side (GENRES): double bar at start
+             FK side (BOOKS):  crow foot at end
+
+          2) BOOKS.id → BOOK_AUTHORS.book_id
+             BOOKS bottom y=150, centre-x = 402
+             BOOK_AUTHORS top y=230, book_id row centre-y = 261
+             BOOK_AUTHORS left x=310
+             Path: BOOKS bottom (402,150) → down to y=190 → left to x=295 → down to y=261 → (310,261)
+             Cleaner: exit BOOKS right(495,51) → go right to 540 → down to 261 → left to 495... 
+             Actually: BOOKS id is PK at top, BOOK_AUTHORS.book_id is FK.
+             Exit BOOKS right at id row y=51: (495,51) → (540,51) → (540,261) → (495,261)
+             PK double bar at (495,51) start, crow at (495,261) end
+
+          3) AUTHORS.id → BOOK_AUTHORS.author_id
+             AUTHORS right x=200, id row y=182+9=191
+             BOOK_AUTHORS left x=310, author_id row y=270+9=279
+             Path: (200,191) → (255,191) → (255,279) → (310,279)
+             PK double bar at start, crow at end
+
+          4) BOOKS.id → BORROWINGS.book_id
+             BOOKS right x=495, id row y=51
+             BORROWINGS left x=590, book_id row y=280+9=289
+             Path: (495,51) already used — use separate route
+             Go from BOOKS right at y=51: (495,51) → (555,51) → (555,289) → (590,289)
+
+          5) READERS.id → BORROWINGS.reader_id
+             READERS right x=200, id row y=392+9=401
+             BORROWINGS left x=590, reader_id row y=298+9=307
+             Path: (200,401) → (570,401) → (570,307) → (590,307)
+             But that passes through BOOK_AUTHORS area — route around:
+             (200,401) → (556,401) → (556,307) → (590,307)
+
+          PROBLEM: lines 2 and 4 both exit BOOKS right at y=51 same point.
+          Fix: line 4 exits at BOOKS right y=60 (slightly offset), line 2 at y=51
+          Actually better: 
+          - BOOKS→BA: exit BOOKS bottom centre (402,150) → down to 215 → left to 295 → down to 261 → right to 310 — too complex
+          - Cleaner: exit BOOKS right at row id (y=51), go to x=550, then down to y=261, then left to x=495
+            This is line going right from BOOKS past the gap, then turning.
+          
+          Let me use clean separate routing:
+          Line BOOKS→BA.book_id:  BOOKS right (495, 51) → x=540, y=51 → x=540, y=261 → x=495, y=261
+          Line BOOKS→BORR.book_id: exit BOOKS right at y=51 same... offset slightly:
+            BOOKS right (495, 60) → x=553, y=60 → x=553, y=289 → x=590, y=289
+          
+          These won't overlap if using x=540 vs x=553.
+        -->
+
+        <!-- LINE 1: GENRES.id ──||──<── BOOKS.genre_id -->
+        <!-- GENRES right (180,51) → bend x=245 → BOOKS left (310,123) -->
+        <path d="M180,51 L245,51 L245,123 L310,123"
+          fill="none" stroke="#555" stroke-width="1.5"
+          marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <!-- midpoint label -->
+        <text x="210" y="47" font-size="9" fill="#4a7c59" font-weight="bold">1</text>
+        <text x="298" y="119" font-size="9" fill="#4a7c59" font-weight="bold">∞</text>
+
+        <!-- LINE 2: BOOKS.id ──||──<── BOOK_AUTHORS.book_id -->
+        <!-- BOOKS right (495,51) → x=540 → y=261 → BOOK_AUTHORS right (495,261) -->
+        <path d="M495,51 L540,51 L540,261 L495,261"
+          fill="none" stroke="#555" stroke-width="1.5"
+          marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <text x="500" y="47" font-size="9" fill="#2e7c6e" font-weight="bold">1</text>
+        <text x="497" y="275" font-size="9" fill="#2e7c6e" font-weight="bold">∞</text>
+
+        <!-- LINE 3: AUTHORS.id ──||──<── BOOK_AUTHORS.author_id -->
+        <!-- AUTHORS right (200,191) → x=255 → y=279 → BOOK_AUTHORS left (310,279) -->
+        <path d="M200,191 L255,191 L255,279 L310,279"
+          fill="none" stroke="#555" stroke-width="1.5"
+          marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <text x="205" y="187" font-size="9" fill="#4a5a8c" font-weight="bold">1</text>
+        <text x="298" y="292" font-size="9" fill="#4a5a8c" font-weight="bold">∞</text>
+
+        <!-- LINE 4: BOOKS.id ──||──<── BORROWINGS.book_id -->
+        <!-- BOOKS right (495,60) → x=553 → y=289 → BORROWINGS left (590,289) -->
+        <path d="M495,60 L553,60 L553,289 L590,289"
+          fill="none" stroke="#555" stroke-width="1.5"
+          marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <text x="498" y="75" font-size="9" fill="#8c4a2e" font-weight="bold">1</text>
+        <text x="576" y="304" font-size="9" fill="#8c4a2e" font-weight="bold">∞</text>
+
+        <!-- LINE 5: READERS.id ──||──<── BORROWINGS.reader_id -->
+        <!-- READERS right (200,401) → x=556 → y=307 → BORROWINGS left (590,307) -->
+        <path d="M200,401 L556,401 L556,307 L590,307"
+          fill="none" stroke="#555" stroke-width="1.5"
+          marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <text x="210" y="397" font-size="9" fill="#8c4a2e" font-weight="bold">1</text>
+        <text x="576" y="322" font-size="9" fill="#8c4a2e" font-weight="bold">∞</text>
+
+        <!-- ===================== LEGEND ===================== -->
+        <rect x="590" y="30" width="240" height="88" fill="#f9f9f9" stroke="#bbb" stroke-width="1" rx="3"/>
+        <text x="710" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">Crow's Foot нотация</text>
+        <!-- one -->
+        <line x1="606" y1="62" x2="650" y2="62" stroke="#555" stroke-width="1.5" marker-start="url(#er-one)" marker-end="url(#er-one-r)"/>
+        <text x="658" y="66" font-size="10" fill="#444">Один (обязательный)</text>
+        <!-- one to many -->
+        <line x1="606" y1="82" x2="650" y2="82" stroke="#555" stroke-width="1.5" marker-start="url(#er-one)" marker-end="url(#er-crow-r)"/>
+        <text x="658" y="86" font-size="10" fill="#444">Один ко многим (1:∞)</text>
+        <!-- badges -->
+        <rect x="606" y="96" width="18" height="12" rx="2" fill="#fff3cd"/>
+        <text x="615" y="106" text-anchor="middle" font-size="8" font-weight="bold" fill="#856404">PK</text>
+        <text x="628" y="106" font-size="10" fill="#444">Первичный ключ</text>
+        <rect x="700" y="96" width="18" height="12" rx="2" fill="#cfe2ff"/>
+        <text x="709" y="106" text-anchor="middle" font-size="8" font-weight="bold" fill="#084298">FK</text>
+        <text x="722" y="106" font-size="10" fill="#444">Внешний ключ</text>
+      </svg>
+
+      <!-- Dark mode overlay for SVG text -->
+      <style>
+        [data-theme="dark"] #er-svg text { fill: #e0ddd5 !important; }
+        [data-theme="dark"] #er-svg text[fill="#555"], [data-theme="dark"] #er-svg text[fill="#444"], [data-theme="dark"] #er-svg text[fill="#333"] { fill: #9a98a0 !important; }
+        [data-theme="dark"] #er-svg text[fill="#222"] { fill: #d4d2cc !important; }
+        [data-theme="dark"] #er-svg rect[fill="white"], [data-theme="dark"] #er-svg rect[fill="#f9f9f9"], [data-theme="dark"] #er-svg rect[fill="#f0f4f0"], [data-theme="dark"] #er-svg rect[fill="#f0f2f8"], [data-theme="dark"] #er-svg rect[fill="#f8f2f0"] { fill: #1e2535 !important; }
+        [data-theme="dark"] #er-svg rect[fill="#fffbe6"], [data-theme="dark"] #er-svg rect[fill="#fff8e6"] { fill: #2a2510 !important; }
+        [data-theme="dark"] #er-svg rect[fill="#f9f9f9"] { fill: #242938 !important; }
+        [data-theme="dark"] #er-svg rect[fill="#f9f9f9 "] { fill: #242938 !important; }
+        [data-theme="dark"] #er-svg line, [data-theme="dark"] #er-svg path[fill="none"] { stroke: #8a88a0 !important; }
+        [data-theme="dark"] #er-svg rect[fill="#f9f9f9"][stroke="#bbb"] { fill: #1c2130 !important; stroke: #3a3d50 !important; }
+      </style>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NORMAL FORMS -->
+<div class="modal-overlay" id="modal-nf">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">🛡 Нормальные формы базы данных</div><div class="modal-sub">База данных LIBRARY соответствует 1НФ, 2НФ, 3НФ</div></div>
+      <button class="modal-close" onclick="closeModal('modal-nf')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="nf-card" style="border-color:var(--accent)">
+        <div class="nf-title"><span style="color:var(--accent)">✅</span> 1НФ — Первая нормальная форма</div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:8px;">Все атрибуты атомарны (неделимы):</p>
+        <ul class="nf-list">
+          <li>ФИО авторов разбито: last_name, first_name, middle_name</li>
+          <li>ФИО читателей разбито: last_name, first_name, middle_name</li>
+          <li>Каждая ячейка содержит одно значение</li>
+          <li>Нет повторяющихся групп</li>
+        </ul>
+      </div>
+      <div class="nf-card" style="border-color:var(--blue)">
+        <div class="nf-title"><span style="color:var(--blue)">✅</span> 2НФ — Вторая нормальная форма</div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:8px;">Все неключевые атрибуты зависят от полного первичного ключа:</p>
+        <ul class="nf-list">
+          <li>В BOOK_AUTHORS составной ключ (book_id, author_id) — нет других атрибутов</li>
+          <li>Все атрибуты BOOKS зависят от book_id</li>
+          <li>Все атрибуты AUTHORS зависят от author_id</li>
+        </ul>
+      </div>
+      <div class="nf-card" style="border-color:var(--violet)">
+        <div class="nf-title"><span style="color:var(--violet)">✅</span> 3НФ — Третья нормальная форма</div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:8px;">Нет транзитивных зависимостей:</p>
+        <ul class="nf-list">
+          <li>genre_name вынесен в таблицу GENRES (не дублируется в BOOKS)</li>
+          <li>country хранится в AUTHORS (не дублируется в BOOKS)</li>
+          <li>Все неключевые атрибуты зависят только от PK</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD BOOK -->
+<div class="modal-overlay" id="modal-add-book">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">➕ Добавить новую книгу</div></div>
+      <button class="modal-close" onclick="closeModal('modal-add-book')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><div><label>Название</label><input id="nb-title" placeholder="Название книги"></div></div>
+      <div class="form-row cols-2">
+        <div><label>ISBN</label><input id="nb-isbn" placeholder="978-..."></div>
+        <div><label>Год публикации</label><input id="nb-year" type="number" placeholder="2024"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Жанр</label>
+          <select id="nb-genre">
+            <option value="">— выберите жанр —</option>
+            <option value="1">Роман</option>
+            <option value="2">Детектив</option>
+            <option value="3">Фантастика</option>
+            <option value="4">Поэзия</option>
+            <option value="5">История</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-book')">Отмена</button>
+      <button class="btn btn-primary" onclick="addBook()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD READER -->
+<div class="modal-overlay" id="modal-add-reader">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">➕ Добавить нового читателя</div></div>
+      <button class="modal-close" onclick="closeModal('modal-add-reader')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-3">
+        <div><label>Фамилия</label><input id="nr-last" placeholder="Иванов"></div>
+        <div><label>Имя</label><input id="nr-first" placeholder="Иван"></div>
+        <div><label>Отчество</label><input id="nr-mid" placeholder="Иванович"></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label>Email</label><input id="nr-email" type="email" placeholder="email@mail.ru"></div>
+        <div><label>Телефон</label><input id="nr-phone" placeholder="+7-900-..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-reader')">Отмена</button>
+      <button class="btn btn-primary" onclick="addReader()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: BORROW BOOK -->
+<div class="modal-overlay" id="modal-borrow">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">📖 Выдать книгу</div></div>
+      <button class="modal-close" onclick="closeModal('modal-borrow')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><div><label>Книга (доступные)</label><select id="borrow-book"><option value="">— выберите книгу —</option></select></div></div>
+      <div class="form-row"><div><label>Читатель</label><select id="borrow-reader"><option value="">— выберите читателя —</option></select></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-borrow')">Отмена</button>
+      <button class="btn btn-violet" onclick="borrowBook()">Выдать</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PROFILE -->
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">👤 Личный кабинет</div><div class="modal-sub">Демо-версия авторизации</div></div>
+      <button class="modal-close" onclick="closeModal('modal-profile')">✕</button>
+    </div>
+    <div class="modal-body" id="profile-body"></div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA STORE ====================
+const now = new Date();
+const d = (days) => new Date(now.getTime() - days * 86400000);
+
+const DB = {
+  genres: [
+    { id: 1, name: 'Роман' },
+    { id: 2, name: 'Детектив' },
+    { id: 3, name: 'Фантастика' },
+    { id: 4, name: 'Поэзия' },
+    { id: 5, name: 'История' },
+  ],
+  authors: [
+    { id: 1, lastName: 'Булгаков', firstName: 'Михаил', middleName: 'Афанасьевич', birthYear: 1891, country: 'Россия' },
+    { id: 2, lastName: 'Достоевский', firstName: 'Фёдор', middleName: 'Михайлович', birthYear: 1821, country: 'Россия' },
+    { id: 3, lastName: 'Кристи', firstName: 'Агата', middleName: null, birthYear: 1890, country: 'Великобритания' },
+    { id: 4, lastName: 'Лем', firstName: 'Станислав', middleName: null, birthYear: 1921, country: 'Польша' },
+    { id: 5, lastName: 'Пушкин', firstName: 'Александр', middleName: 'Сергеевич', birthYear: 1799, country: 'Россия' },
+    { id: 6, lastName: 'Толстой', firstName: 'Лев', middleName: 'Николаевич', birthYear: 1828, country: 'Россия' },
+    { id: 7, lastName: 'Херберт', firstName: 'Фрэнк', middleName: null, birthYear: 1920, country: 'США' },
+    { id: 8, lastName: 'Есенин', firstName: 'Сергей', middleName: 'Александрович', birthYear: 1895, country: 'Россия' },
+    { id: 9, lastName: 'Карамзин', firstName: 'Николай', middleName: 'Михайлович', birthYear: 1766, country: 'Россия' },
+  ],
+  books: [
+    { id: 1, title: 'Мастер и Маргарита', isbn: '978-5-17-090431-1', publishYear: 1967, genreId: 1, isAvailable: false },
+    { id: 2, title: 'Преступление и наказание', isbn: '978-5-17-080261-8', publishYear: 1866, genreId: 1, isAvailable: false },
+    { id: 3, title: 'Убийство в Восточном экспрессе', isbn: '978-5-17-090123-5', publishYear: 1934, genreId: 2, isAvailable: false },
+    { id: 4, title: 'Десять негритят', isbn: '978-5-17-090456-4', publishYear: 1939, genreId: 2, isAvailable: false },
+    { id: 5, title: 'Солярис', isbn: '978-5-17-090789-3', publishYear: 1961, genreId: 3, isAvailable: false },
+    { id: 6, title: 'Евгений Онегин', isbn: '978-5-17-090321-7', publishYear: 1833, genreId: 4, isAvailable: false },
+    { id: 7, title: 'Война и мир', isbn: '978-5-17-090654-1', publishYear: 1869, genreId: 1, isAvailable: false },
+    { id: 8, title: 'Дюна', isbn: '978-5-17-090987-6', publishYear: 1965, genreId: 3, isAvailable: false },
+    { id: 9, title: 'Стихотворения', isbn: '978-5-17-090234-0', publishYear: 1916, genreId: 4, isAvailable: true },
+    { id: 10, title: 'История государства Российского', isbn: '978-5-17-090876-2', publishYear: 1818, genreId: 5, isAvailable: true },
+    { id: 11, title: 'Антология русской классики', isbn: '978-5-17-091234-8', publishYear: 2000, genreId: 1, isAvailable: true },
+  ],
+  bookAuthors: [
+    { bookId: 1, authorId: 1 }, { bookId: 2, authorId: 2 },
+    { bookId: 3, authorId: 3 }, { bookId: 4, authorId: 3 },
+    { bookId: 5, authorId: 4 }, { bookId: 6, authorId: 5 },
+    { bookId: 7, authorId: 6 }, { bookId: 8, authorId: 7 },
+    { bookId: 9, authorId: 8 }, { bookId: 10, authorId: 9 },
+    { bookId: 11, authorId: 1 }, { bookId: 11, authorId: 2 },
+  ],
+  readers: [
+    { id: 1, lastName: 'Иванова', firstName: 'Анна', middleName: 'Сергеевна', email: 'ivanova@mail.ru', phone: '+7-900-100-0001', registration: d(120) },
+    { id: 2, lastName: 'Петров', firstName: 'Дмитрий', middleName: 'Иванович', email: 'petrov@mail.ru', phone: '+7-900-100-0002', registration: d(200) },
+    { id: 3, lastName: 'Сидорова', firstName: 'Ольга', middleName: 'Николаевна', email: 'sidorova@mail.ru', phone: '+7-900-100-0003', registration: d(90) },
+    { id: 4, lastName: 'Козлов', firstName: 'Алексей', middleName: 'Юрьевич', email: 'kozlov@mail.ru', phone: '+7-900-100-0004', registration: d(150) },
+    { id: 5, lastName: 'Новикова', firstName: 'Екатерина', middleName: 'Петровна', email: 'novikova@mail.ru', phone: '+7-900-100-0005', registration: d(75) },
+    { id: 6, lastName: 'Морозов', firstName: 'Сергей', middleName: 'Александрович', email: 'morozov@mail.ru', phone: '+7-900-100-0006', registration: d(180) },
+    { id: 7, lastName: 'Волкова', firstName: 'Татьяна', middleName: 'Дмитриевна', email: 'volkova@mail.ru', phone: '+7-900-100-0007', registration: d(60) },
+    { id: 8, lastName: 'Лебедева', firstName: 'Наталья', middleName: 'Юрьевна', email: 'lebedeva@mail.ru', phone: '+7-900-100-0008', registration: d(110) },
+    { id: 9, lastName: 'Орлов', firstName: 'Максим', middleName: 'Олегович', email: 'orlov@mail.ru', phone: '+7-900-100-0009', registration: d(85) },
+    { id: 10, lastName: 'Соколов', firstName: 'Андрей', middleName: 'Викторович', email: 'sokolov@mail.ru', phone: '+7-900-100-0010', registration: d(140) },
+  ],
+  borrowings: [
+    { id: 1, bookId: 1, readerId: 1, borrowDate: d(5), returnDate: null, status: 'active' },
+    { id: 2, bookId: 3, readerId: 3, borrowDate: d(10), returnDate: null, status: 'active' },
+    { id: 3, bookId: 5, readerId: 5, borrowDate: d(3), returnDate: null, status: 'active' },
+    { id: 4, bookId: 8, readerId: 8, borrowDate: d(7), returnDate: null, status: 'active' },
+    { id: 5, bookId: 6, readerId: 10, borrowDate: d(2), returnDate: null, status: 'active' },
+    { id: 6, bookId: 2, readerId: 2, borrowDate: d(55), returnDate: null, status: 'overdue' },
+    { id: 7, bookId: 4, readerId: 4, borrowDate: d(50), returnDate: null, status: 'overdue' },
+    { id: 8, bookId: 7, readerId: 6, borrowDate: d(45), returnDate: null, status: 'overdue' },
+    { id: 9, bookId: 1, readerId: 3, borrowDate: d(60), returnDate: d(45), status: 'returned' },
+    { id: 10, bookId: 5, readerId: 1, borrowDate: d(40), returnDate: d(25), status: 'returned' },
+    { id: 11, bookId: 8, readerId: 5, borrowDate: d(35), returnDate: d(20), status: 'returned' },
+    { id: 12, bookId: 3, readerId: 7, borrowDate: d(30), returnDate: d(15), status: 'returned' },
+    { id: 13, bookId: 6, readerId: 9, borrowDate: d(25), returnDate: d(10), status: 'returned' },
+    { id: 14, bookId: 9, readerId: 2, borrowDate: d(20), returnDate: d(5), status: 'returned' },
+  ],
+  nextIds: { book: 12, reader: 11, borrowing: 15 }
+};
+
+// ==================== HELPERS ====================
+const isLoggedIn = { value: false };
+
+function getGenreName(id) {
+  return DB.genres.find(g => g.id == id)?.name || '—';
+}
+function getBookAuthors(bookId) {
+  return DB.bookAuthors
+    .filter(ba => ba.bookId == bookId)
+    .map(ba => DB.authors.find(a => a.id == ba.authorId))
+    .filter(Boolean)
+    .map(a => `${a.lastName} ${a.firstName[0]}.${a.middleName ? a.middleName[0] + '.' : ''}`)
+    .join(', ');
+}
+function getAuthorFullName(a) {
+  return `${a.lastName} ${a.firstName}${a.middleName ? ' ' + a.middleName : ''}`;
+}
+function fmtDate(date) {
+  if (!date) return '—';
+  const d = new Date(date);
+  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function daysSince(date) {
+  return Math.floor((now - new Date(date)) / 86400000);
+}
+function badge(text, cls) {
+  return `<span class="badge badge-${cls}">${text}</span>`;
+}
+function statusBadge(status) {
+  const map = { active: ['Активна', 'green'], overdue: ['Просрочена', 'red'], returned: ['Возвращена', 'gray'] };
+  const [t, c] = map[status] || [status, 'gray'];
+  return badge(t, c);
+}
+
+// ==================== THEME ====================
+function toggleTheme() {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
+}
+
+// ==================== TABS ====================
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab')[['dashboard','books','authors','readers','borrowings'].indexOf(name)].classList.add('active');
+  if (name === 'books') renderBooks();
+  if (name === 'authors') renderAuthors();
+  if (name === 'readers') renderReaders();
+  if (name === 'borrowings') renderBorrowings();
+}
+
+// ==================== MODAL ====================
+function openModal(id) {
+  if (id === 'modal-borrow') fillBorrowSelects();
+  if (id === 'modal-profile') renderProfile();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ==================== AUTH ====================
+function handleAuth() {
+  if (isLoggedIn.value) {
+    openModal('modal-profile');
+  } else {
+    isLoggedIn.value = true;
+    document.getElementById('auth-btn').innerHTML = '👤 <span>Личный кабинет</span>';
+    openModal('modal-profile');
+  }
+}
+
+function renderProfile() {
+  const reader = DB.readers[0];
+  const myBorrowings = DB.borrowings.filter(b => b.readerId === reader.id);
+  const active = myBorrowings.filter(b => b.status === 'active');
+  const returned = myBorrowings.filter(b => b.status === 'returned');
+  const overdue = myBorrowings.filter(b => b.status === 'overdue');
+  const initials = reader.lastName[0] + reader.firstName[0];
+  document.getElementById('profile-body').innerHTML = `
+    <div class="profile-header">
+      <div class="avatar">${initials}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:16px">${getAuthorFullName(reader)}</div>
+        <div style="margin-top:4px">${badge('Читатель','violet')}</div>
+      </div>
+      <button class="btn btn-sm" onclick="logout()">🚪 Выйти</button>
+    </div>
+    <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">
+      📧 ${reader.email} &nbsp;•&nbsp; 📞 ${reader.phone} &nbsp;•&nbsp; 📅 Рег.: ${fmtDate(reader.registration)}
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="profile-stat-num" style="color:var(--accent)">${myBorrowings.length}</div><div style="font-size:11px;color:var(--text3)">Всего выдач</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:var(--blue)">${active.length}</div><div style="font-size:11px;color:var(--text3)">На руках</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:var(--text2)">${returned.length}</div><div style="font-size:11px;color:var(--text3)">Возвращено</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:var(--red)">${overdue.length}</div><div style="font-size:11px;color:var(--text3)">Просрочено</div></div>
+    </div>
+    ${active.length ? `<div style="font-weight:700;margin-bottom:8px;font-size:13px">📖 Книги на руках</div>` + active.map(b => {
+      const book = DB.books.find(bk => bk.id === b.bookId);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--accent-light);border-radius:6px;margin-bottom:6px">
+        <span>📗</span>
+        <div style="flex:1"><div style="font-weight:600;font-size:13px">${book?.title}</div><div style="font-size:11px;color:var(--text3)">с ${fmtDate(b.borrowDate)}</div></div>
+        ${badge('Активна','green')}
+      </div>`;
+    }).join('') : '<div class="empty" style="padding:16px">Нет книг на руках</div>'}
+  `;
+}
+
+function logout() {
+  isLoggedIn.value = false;
+  document.getElementById('auth-btn').innerHTML = '👤 <span>Демо-вход</span>';
+  closeModal('modal-profile');
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  const total = DB.borrowings.length;
+  const active = DB.borrowings.filter(b => b.status === 'active').length;
+  const overdue = DB.borrowings.filter(b => b.status === 'overdue').length;
+  const returned = DB.borrowings.filter(b => b.status === 'returned').length;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card bg-blue"><div class="stat-icon">📖</div><div><div class="stat-num">${DB.books.length}</div><div class="stat-label">Книг</div></div></div>
+    <div class="stat-card bg-amber"><div class="stat-icon">✍️</div><div><div class="stat-num">${DB.authors.length}</div><div class="stat-label">Авторов</div></div></div>
+    <div class="stat-card bg-pink"><div class="stat-icon">👥</div><div><div class="stat-num">${DB.readers.length}</div><div class="stat-label">Читателей</div></div></div>
+    <div class="stat-card bg-violet"><div class="stat-icon">🔄</div><div><div class="stat-num">${total}</div><div class="stat-label">Выдач</div></div></div>
+    <div class="stat-card bg-green"><div class="stat-icon">✅</div><div><div class="stat-num">${active}</div><div class="stat-label">Активных</div></div></div>
+    <div class="stat-card bg-red"><div class="stat-icon">⚠️</div><div><div class="stat-num">${overdue}</div><div class="stat-label">Просрочено</div></div></div>
+    <div class="stat-card bg-slate"><div class="stat-icon">⏱️</div><div><div class="stat-num">${returned}</div><div class="stat-label">Возвращено</div></div></div>
+  `;
+
+  // Popular books
+  const borrowCount = {};
+  DB.borrowings.forEach(b => { borrowCount[b.bookId] = (borrowCount[b.bookId] || 0) + 1; });
+  const top3 = DB.books
+    .map(b => ({ ...b, count: borrowCount[b.id] || 0 }))
+    .sort((a,b) => b.count - a.count).slice(0, 3);
+  document.getElementById('popular-books').innerHTML = top3.map((book, i) => `
+    <div class="popular-item">
+      <div class="rank rank-${i+1}">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book.title}</div>
+        <div style="font-size:11px;color:var(--text3)">${getBookAuthors(book.id)}</div>
+      </div>
+      ${badge(book.count + ' выдач', 'gray')}
+    </div>
+  `).join('');
+
+  // Genre stats
+  const genreBorrows = {};
+  DB.borrowings.forEach(b => {
+    const book = DB.books.find(bk => bk.id === b.bookId);
+    if (book) genreBorrows[book.genreId] = (genreBorrows[book.genreId] || 0) + 1;
+  });
+  const maxBorrows = Math.max(1, ...Object.values(genreBorrows));
+  document.getElementById('genre-stats').innerHTML = DB.genres.map(g => {
+    const cnt = DB.books.filter(b => b.genreId === g.id).length;
+    const bc = genreBorrows[g.id] || 0;
+    return `<div class="progress-item">
+      <div class="progress-label"><span style="font-weight:600">${g.name}</span><span style="color:var(--text3)">${cnt} книг • ${bc} выдач</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(bc/maxBorrows*100).toFixed(0)}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Recent borrowings
+  const recent = [...DB.borrowings].sort((a,b) => new Date(b.borrowDate)-new Date(a.borrowDate)).slice(0,8);
+  document.getElementById('recent-borrowings').innerHTML = recent.map(b => {
+    const book = DB.books.find(bk => bk.id === b.bookId);
+    const reader = DB.readers.find(r => r.id === b.readerId);
+    return `<div class="recent-item">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${book?.title}</div>
+        <div style="font-size:11px;color:var(--text3)">${reader?.lastName} ${reader?.firstName}</div>
+      </div>
+      ${statusBadge(b.status)}
+    </div>`;
+  }).join('');
+
+  // Overdue
+  const overdueItems = DB.borrowings.filter(b => b.status === 'overdue');
+  document.getElementById('overdue-list').innerHTML = overdueItems.length === 0
+    ? '<div class="empty">Нет просроченных выдач ✅</div>'
+    : overdueItems.map(b => {
+        const book = DB.books.find(bk => bk.id === b.bookId);
+        const reader = DB.readers.find(r => r.id === b.readerId);
+        const days = daysSince(b.borrowDate);
+        return `<div class="overdue-item">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:13px">${book?.title}</div>
+            <div style="font-size:11px;color:var(--text3)">${reader?.lastName} ${reader?.firstName} • ${reader?.phone}</div>
+          </div>
+          ${badge(days + ' дней', 'red')}
+        </div>`;
+      }).join('');
+}
+
+// ==================== BOOKS ====================
+function renderBooks() {
+  const q = document.getElementById('book-search').value.toLowerCase();
+  const filtered = DB.books.filter(b =>
+    b.title.toLowerCase().includes(q) || (b.isbn || '').toLowerCase().includes(q)
+  );
+  document.getElementById('books-tbody').innerHTML = filtered.map(book => `
+    <tr>
+      <td><div class="td-title">${book.title}</div></td>
+      <td><div class="badges">${DB.bookAuthors.filter(ba => ba.bookId === book.id).map(ba => {
+        const a = DB.authors.find(x => x.id === ba.authorId);
+        return a ? `<span class="badge badge-gray">${a.lastName} ${a.firstName[0]}.</span>` : '';
+      }).join('')}</div></td>
+      <td>${badge(getGenreName(book.genreId), 'blue')}</td>
+      <td>${book.publishYear || '—'}</td>
+      <td style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace">${book.isbn || '—'}</td>
+      <td>${book.isAvailable ? badge('Доступна','green') : badge('Выдана','red')}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" class="empty">Ничего не найдено</td></tr>';
+}
+
+// ==================== AUTHORS ====================
+function renderAuthors() {
+  const q = document.getElementById('author-search').value.toLowerCase();
+  const filtered = DB.authors.filter(a =>
+    a.lastName.toLowerCase().includes(q) || a.firstName.toLowerCase().includes(q) ||
+    (a.middleName || '').toLowerCase().includes(q)
+  );
+  document.getElementById('authors-grid').innerHTML = filtered.map(author => {
+    const books = DB.bookAuthors.filter(ba => ba.authorId === author.id)
+      .map(ba => DB.books.find(b => b.id === ba.bookId)).filter(Boolean);
+    return `<div class="author-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="author-name">${getAuthorFullName(author)}</div>
+          <div class="author-meta">${author.country || '—'} · ${author.birthYear || '—'} г.р.</div>
+        </div>
+        ${badge(books.length + ' книг', 'gray')}
+      </div>
+      <div class="author-books">
+        ${books.map(b => `<div class="author-book-item">▸ ${b.title} ${badge(getGenreName(b.genreId),'blue')}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty" style="grid-column:1/-1">Ничего не найдено</div>';
+}
+
+// ==================== READERS ====================
+function renderReaders() {
+  const q = document.getElementById('reader-search').value.toLowerCase();
+  const filtered = DB.readers.filter(r =>
+    getAuthorFullName(r).toLowerCase().includes(q) ||
+    (r.email || '').toLowerCase().includes(q) ||
+    (r.phone || '').toLowerCase().includes(q)
+  );
+  document.getElementById('readers-tbody').innerHTML = filtered.map(reader => {
+    const rbs = DB.borrowings.filter(b => b.readerId === reader.id);
+    const active = rbs.filter(b => b.status === 'active');
+    const overdue = rbs.filter(b => b.status === 'overdue');
+    const currentBooks = [...active, ...overdue];
+    return `<tr>
+      <td><div class="td-title">${getAuthorFullName(reader)}</div></td>
+      <td><div class="td-title" style="font-size:12px">${reader.email || '—'}</div><div class="td-sub">${reader.phone || '—'}</div></td>
+      <td>${rbs.length}</td>
+      <td>${badge(active.length, 'green')}</td>
+      <td>${overdue.length > 0 ? badge(overdue.length, 'red') : '<span style="color:var(--text3)">0</span>'}</td>
+      <td><div class="badges">${currentBooks.slice(0,2).map(b => {
+        const book = DB.books.find(bk => bk.id === b.bookId);
+        return book ? `<span class="badge badge-${b.status === 'overdue' ? 'red' : 'gray'}">${book.title}</span>` : '';
+      }).join('')}${currentBooks.length > 2 ? badge('+' + (currentBooks.length-2), 'violet') : ''}</div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="empty">Ничего не найдено</td></tr>';
+}
+
+// ==================== BORROWINGS ====================
+function renderBorrowings() {
+  document.getElementById('borrowings-tbody').innerHTML = DB.borrowings.map(b => {
+    const book = DB.books.find(bk => bk.id === b.bookId);
+    const reader = DB.readers.find(r => r.id === b.readerId);
+    const days = b.returnDate ? daysSince(b.borrowDate) - daysSince(b.returnDate) : daysSince(b.borrowDate);
+    return `<tr>
+      <td><div class="td-title">${book?.title || '—'}</div><div class="td-sub">${getBookAuthors(b.bookId)}</div></td>
+      <td><div class="td-title">${reader ? getAuthorFullName(reader) : '—'}</div><div class="td-sub">${reader?.phone || ''}</div></td>
+      <td>${fmtDate(b.borrowDate)}</td>
+      <td>${badge(days, days > 30 ? 'red' : 'gray')}</td>
+      <td>${statusBadge(b.status)}</td>
+      <td><div class="action-btns">
+        ${b.status !== 'returned' ? `<button class="btn btn-sm" onclick="returnBook(${b.id},false)" title="Вернуть">✅</button>` : ''}
+        ${b.status === 'active' ? `<button class="btn btn-sm" onclick="returnBook(${b.id},true)" title="Просрочить">⚠️</button>` : ''}
+      </div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="empty">Нет выдач</td></tr>';
+}
+
+function returnBook(id, overdue) {
+  const b = DB.borrowings.find(x => x.id === id);
+  if (!b) return;
+  b.status = overdue ? 'overdue' : 'returned';
+  if (!overdue) { b.returnDate = new Date(); const book = DB.books.find(bk => bk.id === b.bookId); if (book) book.isAvailable = true; }
+  renderBorrowings(); renderDashboard();
+}
+
+// ==================== ADD BOOK ====================
+function addBook() {
+  const title = document.getElementById('nb-title').value.trim();
+  if (!title) return alert('Введите название книги');
+  const newBook = {
+    id: DB.nextIds.book++,
+    title,
+    isbn: document.getElementById('nb-isbn').value.trim() || null,
+    publishYear: parseInt(document.getElementById('nb-year').value) || null,
+    genreId: parseInt(document.getElementById('nb-genre').value) || 1,
+    isAvailable: true
+  };
+  DB.books.push(newBook);
+  closeModal('modal-add-book');
+  document.getElementById('nb-title').value = '';
+  document.getElementById('nb-isbn').value = '';
+  document.getElementById('nb-year').value = '';
+  renderBooks(); renderDashboard();
+}
+
+// ==================== ADD READER ====================
+function addReader() {
+  const last = document.getElementById('nr-last').value.trim();
+  const first = document.getElementById('nr-first').value.trim();
+  if (!last || !first) return alert('Введите фамилию и имя');
+  const newReader = {
+    id: DB.nextIds.reader++,
+    lastName: last, firstName: first,
+    middleName: document.getElementById('nr-mid').value.trim() || null,
+    email: document.getElementById('nr-email').value.trim() || null,
+    phone: document.getElementById('nr-phone').value.trim() || null,
+    registration: new Date()
+  };
+  DB.readers.push(newReader);
+  closeModal('modal-add-reader');
+  ['nr-last','nr-first','nr-mid','nr-email','nr-phone'].forEach(id => document.getElementById(id).value = '');
+  renderReaders(); renderDashboard();
+}
+
+// ==================== BORROW ====================
+function fillBorrowSelects() {
+  const available = DB.books.filter(b => b.isAvailable);
+  document.getElementById('borrow-book').innerHTML =
+    '<option value="">— выберите книгу —</option>' +
+    available.map(b => `<option value="${b.id}">${b.title}</option>`).join('');
+  document.getElementById('borrow-reader').innerHTML =
+    '<option value="">— выберите читателя —</option>' +
+    DB.readers.map(r => `<option value="${r.id}">${getAuthorFullName(r)}</option>`).join('');
+}
+
+function borrowBook() {
+  const bookId = parseInt(document.getElementById('borrow-book').value);
+  const readerId = parseInt(document.getElementById('borrow-reader').value);
+  if (!bookId || !readerId) return alert('Выберите книгу и читателя');
+  const book = DB.books.find(b => b.id === bookId);
+  if (!book) return;
+  book.isAvailable = false;
+  DB.borrowings.push({ id: DB.nextIds.borrowing++, bookId, readerId, borrowDate: new Date(), returnDate: null, status: 'active' });
+  closeModal('modal-borrow');
+  renderBorrowings(); renderDashboard();
+  if (document.getElementById('tab-books').classList.contains('active')) renderBooks();
+}
+
+// ==================== INIT ====================
+renderDashboard();
+renderBooks();
+renderAuthors();
+renderReaders();
+renderBorrowings();
+</script>
+</body>
+</html>
